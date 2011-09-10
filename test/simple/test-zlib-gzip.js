@@ -19,37 +19,28 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+var common = require('../common');
+var assert = require('assert');
+var gzip = require('zlib').gzip;
 
-NODE_EXT_LIST_START
-NODE_EXT_LIST_ITEM(node_buffer)
-#ifdef __POSIX__
-NODE_EXT_LIST_ITEM(node_cares)
-NODE_EXT_LIST_ITEM(node_child_process)
-#endif
-#if HAVE_OPENSSL
-NODE_EXT_LIST_ITEM(node_crypto)
-#endif
-NODE_EXT_LIST_ITEM(node_evals)
-NODE_EXT_LIST_ITEM(node_fs)
-#ifdef __POSIX__
-NODE_EXT_LIST_ITEM(node_net)
-#endif
-NODE_EXT_LIST_ITEM(node_http_parser)
-#ifdef __POSIX__
-NODE_EXT_LIST_ITEM(node_signal_watcher)
-#endif
-NODE_EXT_LIST_ITEM(node_stdio)
-NODE_EXT_LIST_ITEM(node_os)
-NODE_EXT_LIST_ITEM(node_zlib)
+// Setup our streams
+var writableStream = gzip.createDeflateStream();
+var readableStream = gzip.createInflateStream();
 
-// libuv rewrite
-NODE_EXT_LIST_ITEM(node_timer_wrap)
-NODE_EXT_LIST_ITEM(node_tcp_wrap)
-NODE_EXT_LIST_ITEM(node_udp_wrap)
-NODE_EXT_LIST_ITEM(node_pipe_wrap)
-NODE_EXT_LIST_ITEM(node_cares_wrap)
-NODE_EXT_LIST_ITEM(node_stdio_wrap)
-NODE_EXT_LIST_ITEM(node_process_wrap)
+// Source and destination strings
+var source1 = new Buffer('hello');
+var source2 = new Buffer(' world');
+var collectedString = '';
 
-NODE_EXT_LIST_END
+readableStream.on('data', function(chunk) {
+  collectedString += chunk.toString();
+});
 
+readableStream.on('end', function() {
+  assert.equal(source1.toString() + source2, collectedString);
+});
+
+writableStream.pipe(readableStream);
+writableStream.write(source1);
+writableStream.write(source2);
+writableStream.end();

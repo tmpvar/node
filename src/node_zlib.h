@@ -19,37 +19,39 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#ifndef SRC_ZLIB_H_
+#define SRC_ZLIB_H_
 
-NODE_EXT_LIST_START
-NODE_EXT_LIST_ITEM(node_buffer)
-#ifdef __POSIX__
-NODE_EXT_LIST_ITEM(node_cares)
-NODE_EXT_LIST_ITEM(node_child_process)
-#endif
-#if HAVE_OPENSSL
-NODE_EXT_LIST_ITEM(node_crypto)
-#endif
-NODE_EXT_LIST_ITEM(node_evals)
-NODE_EXT_LIST_ITEM(node_fs)
-#ifdef __POSIX__
-NODE_EXT_LIST_ITEM(node_net)
-#endif
-NODE_EXT_LIST_ITEM(node_http_parser)
-#ifdef __POSIX__
-NODE_EXT_LIST_ITEM(node_signal_watcher)
-#endif
-NODE_EXT_LIST_ITEM(node_stdio)
-NODE_EXT_LIST_ITEM(node_os)
-NODE_EXT_LIST_ITEM(node_zlib)
+#include <node.h>
+#include <v8.h>
 
-// libuv rewrite
-NODE_EXT_LIST_ITEM(node_timer_wrap)
-NODE_EXT_LIST_ITEM(node_tcp_wrap)
-NODE_EXT_LIST_ITEM(node_udp_wrap)
-NODE_EXT_LIST_ITEM(node_pipe_wrap)
-NODE_EXT_LIST_ITEM(node_cares_wrap)
-NODE_EXT_LIST_ITEM(node_stdio_wrap)
-NODE_EXT_LIST_ITEM(node_process_wrap)
+#ifndef Z_BUFSIZE
+#define Z_BUFSIZE 16384
+#endif
 
-NODE_EXT_LIST_END
 
+namespace node {
+using namespace v8;
+
+class ZlibStream : public ObjectWrap {
+public:
+  static void Initialize(Handle<Object> target);
+
+
+  ~ZlibStream();
+  z_stream zstream_;
+
+private:
+
+  ZlibStream(Handle<Object> wrapper);
+  static Handle<Value> New(const Arguments &args);
+  static Persistent<FunctionTemplate> constructor_template;
+
+  static Handle<Value> InitDeflate(const Arguments &args);
+  static Handle<Value> InitInflate(const Arguments &args);
+};
+
+void InitZlib(Handle<Object> target);
+
+}  // namespace node
+#endif  // SRC_ZLIB_H_

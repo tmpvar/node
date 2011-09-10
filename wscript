@@ -186,7 +186,7 @@ def set_options(opt):
                 , help='Build with DTrace (experimental)'
                 , dest='dtrace'
                 )
- 
+
 
   opt.add_option( '--product-type'
                 , action='store'
@@ -292,14 +292,14 @@ def configure(conf):
       Options.options.use_openssl = conf.env["USE_OPENSSL"] = True
       conf.env.append_value("CPPFLAGS", "-DHAVE_OPENSSL=1")
     else:
-      if o.openssl_libpath: 
+      if o.openssl_libpath:
         openssl_libpath = [o.openssl_libpath]
       elif not sys.platform.startswith('win32'):
         openssl_libpath = ['/usr/lib', '/usr/local/lib', '/opt/local/lib', '/usr/sfw/lib']
       else:
         openssl_libpath = [normpath(join(cwd, '../openssl'))]
 
-      if o.openssl_includes: 
+      if o.openssl_includes:
         openssl_includes = [o.openssl_includes]
       elif not sys.platform.startswith('win32'):
         openssl_includes = [];
@@ -857,6 +857,7 @@ def build(bld):
     src/node_os.cc
     src/node_dtrace.cc
     src/node_string.cc
+    src/node_zlib.cc
     src/timer_wrap.cc
     src/handle_wrap.cc
     src/stream_wrap.cc
@@ -893,6 +894,7 @@ def build(bld):
     deps/uv/include
     deps/uv/src/ev
     deps/uv/src/ares
+    deps/zlib
   """
 
   if not bld.env["USE_SHARED_V8"]: node.includes += ' deps/v8/include '
